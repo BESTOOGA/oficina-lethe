@@ -1,0 +1,8 @@
+# Downloaded OpenLethe data used by tools/gerar_catalogo.py
+tools/_cache_openlethe/
+# Old private hosting config
+.openai/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0d0c0a">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,800&family=IBM+Plex+Mono:wght@500;600;700&display=swap">
+  <title>Oficina Lethe · Editor de theme packs</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header><div class="bar wrap">
+    <div class="identity"><span class="brandmark" aria-hidden="true">L</span><strong>LETHE</strong><span class="branddivide"></span><span>Oficina de mods</span></div>
+    <button class="header-help" id="help"><span aria-hidden="true">?</span> Como usar</button>
+  </div></header>
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-copy"><div class="kicker"><i></i> LIMBUS COMPANY</div><h1>Editor de<br><em>theme packs</em></h1><p>Escolha as lutas, monte os grupos de inimigos e exporte seu pacote para o Lethe.</p></div>
+      <div class="hero-art" aria-hidden="true"><img src="hero.webp" alt=""></div>
+    </section>
+    <div class="workspace-bar"><h2>Área de montagem</h2><span id="save-status" role="status">Rascunho local</span></div>
+    <div class="workbench">
+      <section class="panel package" aria-labelledby="pack-heading">
+        <div class="panel-head"><span class="icon-box" data-icon="layers"></span><h3 id="pack-heading">Meu pacote</h3><button id="new-pack" class="new-pack">Novo pacote</button></div>
+        <label class="label" for="pack-name">Nome do pacote</label><input id="pack-name" type="text" maxlength="80" autocomplete="off" required>
+        <div class="pack-options">
+          <label class="label" for="skin">Aparência do pacote</label><div class="skin-select"><span id="swatch" aria-hidden="true"></span><select id="skin"></select></div>
+          <div class="upload-line"><label for="cover" class="label">Capa personalizada</label><input id="cover" type="file" accept="image/png,image/jpeg,image/webp"><p class="option-hint">Os pacotes do jogo usam arte vertical, na proporção de 300 × 553.</p></div>
+          <div id="cover-state" hidden><img id="cover-preview" alt="Prévia da sua capa"><button class="quiet-link" id="reset-cover">Voltar à capa do pacote</button></div>
+        </div>
+        <div class="fight-heading"><h4>Lutas do pacote</h4><label class="fight-total">Quantidade <input id="fight-count" aria-label="Quantidade de lutas" type="number" min="1" max="98" step="1"></label></div>
+        <div class="fight-list" id="fight-list" aria-label="Selecionar luta"></div>
+        <button id="add-fight" class="add wide"><span aria-hidden="true">＋</span> Adicionar luta</button>
+        <div class="boss-box">
+          <div class="fight-heading"><h4>Bosses customizados</h4></div>
+          <p class="option-hint" id="boss-empty">Envie o ZIP de um mod de boss do Lethe (com <code>custom_limbus_data/enemy</code> e uma luta que use o boss). Ele vira uma luta base e um inimigo que você pode usar no pacote.</p>
+          <ul class="boss-list" id="boss-list"></ul>
+          <button type="button" id="boss-upload" class="add wide"><span aria-hidden="true">＋</span> Enviar boss customizado (.zip)</button>
+          <input id="boss-zip" type="file" accept=".zip,application/zip" hidden>
+        </div>
+      </section>
+      <section class="panel inspector" aria-label="Configurações">
+        <div class="tabs" role="tablist" aria-label="Configurações do pacote">
+          <button type="button" role="tab" id="tab-fights" aria-controls="pane-fights" aria-selected="true"><span data-icon="swords"></span> Lutas</button>
+          <button type="button" role="tab" id="tab-floors" aria-controls="pane-floors" aria-selected="false" tabindex="-1"><span data-icon="stairs"></span> Andares</button>
+          <button type="button" role="tab" id="tab-events" aria-controls="pane-events" aria-selected="false" tabindex="-1"><span data-icon="eye"></span> Encontros de abno</button>
+          <button type="button" role="tab" id="tab-gifts" aria-controls="pane-gifts" aria-selected="false" tabindex="-1"><span data-icon="gift"></span> E.G.O Gifts</button>
+          <button type="button" role="tab" id="tab-odds" aria-controls="pane-odds" aria-selected="false" tabindex="-1"><span data-icon="dice"></span> Probabilidades</button>
+        </div>
+        <div role="tabpanel" id="pane-fights" aria-labelledby="tab-fights">
+          <div class="panel-head"><h3 id="fight-heading">Configurar luta</h3><span class="selection-badge" id="which-fight"></span></div>
+          <span class="label" id="template-label">Luta base</span><div id="template-slot"></div><p class="option-hint" id="template-hint" hidden>Esta luta usa scripts do jogo (mecânicas especiais). Trocar os inimigos pode quebrar essas mecânicas.</p>
+          <label class="label title-label" for="fight-title">Nome da luta no jogo</label><input id="fight-title" type="text" maxlength="60" autocomplete="off">
+          <div class="battle-kind">
+            <span class="label" id="kind-label">Formato da luta</span>
+            <div class="seg" role="group" aria-labelledby="kind-label"><button type="button" id="kind-normal">Luta normal</button><button type="button" id="kind-chain">Chain battle</button></div>
+            <p class="option-hint" id="kind-hint"></p>
+          </div>
+          <div id="enemy-section"></div>
+          <button type="button" id="add-wave" class="add wide"><span aria-hidden="true">＋</span> Adicionar onda</button>
+          <div class="edit-actions"><div class="order-tools"><button class="quiet" id="move-up" aria-label="Mover luta para cima" title="Mover luta para cima"></button><button class="quiet" id="move-down" aria-label="Mover luta para baixo" title="Mover luta para baixo"></button></div><button id="remove-fight" class="remove"><span data-icon="trash"></span> Remover luta</button></div>
+        </div>
+        <div role="tabpanel" id="pane-floors" aria-labelledby="tab-floors" hidden>
+          <div class="panel-head"><h3>Onde o pacote aparece</h3><span class="selection-badge" id="floor-badge"></span></div>
+          <p class="option-hint pane-intro">Marque os andares em que o tema entra na seleção de pacotes. Cada modo do Mirror Dungeon tem a própria lista.</p>
+          <fieldset class="floor-set" id="floors-normal"><legend>Modo normal</legend></fieldset>
+          <fieldset class="floor-set" id="floors-hard"><legend>Modo difícil</legend></fieldset>
+          <div class="floor-presets"><span class="label">Atalhos</span><div class="preset-row" id="floor-presets"></div></div>
+          <div class="rate-box">
+            <label class="label" for="rate">Rate up no sorteio</label><select id="rate"><option value="1">Normal · 1 entrada</option><option value="2">Aumentado · 2 entradas</option><option value="4">Alto · 4 entradas</option></select>
+            <p class="option-hint">Cada entrada participa do sorteio dos andares marcados. Com mais entradas, o tema pode aparecer duas vezes na mesma seleção.</p>
+          </div>
+        </div>
+        <div role="tabpanel" id="pane-events" aria-labelledby="tab-events" hidden>
+          <div class="panel-head"><h3>Encontros de abno</h3><span class="selection-badge" id="events-badge"></span></div>
+          <p class="option-hint pane-intro">Escolha quais encontros de anormalidade podem aparecer nos eventos “?” do mapa. Os marcados com estrela têm rate up.</p>
+          <div class="events-tools">
+            <input id="events-search" type="search" placeholder="Buscar por nome ou texto" aria-label="Buscar encontro">
+            <div class="preset-row" id="events-presets"></div>
+          </div>
+          <div class="rate-line"><label class="label" for="events-chance">Chance de vir um encontro com rate up</label><div class="chance"><input id="events-chance" type="range" min="5" max="100" step="5"><output id="events-chance-out"></output></div></div>
+          <p class="map-warn" id="events-warn" hidden></p>
+          <ul class="event-list" id="event-list" aria-label="Encontros de abno"></ul>
+        </div>
+        <div role="tabpanel" id="pane-gifts" aria-labelledby="tab-gifts" hidden><div class="soon"><span class="soon-tag">EM BREVE</span><h3>E.G.O Gifts</h3><p>Aqui vai dar para escolher os E.G.O Gifts que o pacote oferece.</p></div></div>
+        <div role="tabpanel" id="pane-odds" aria-labelledby="tab-odds" hidden><div class="soon"><span class="soon-tag">EM BREVE</span><h3>Probabilidades</h3><p>Aqui vai dar para ajustar as chances de cada tipo de encontro.</p></div></div>
+      </section>
+    </div>
+    <section class="panel preview" aria-labelledby="preview-heading">
+      <div class="panel-head"><span class="icon-box" data-icon="eye"></span><h3 id="preview-heading">Prévia do pacote</h3><span class="preview-note">Como o pacote aparece na seleção de temas</span></div>
+      <div class="preview-grid">
+        <figure class="pick">
+          <div class="pouch-wrap" id="pouch-wrap"></div>
+          <figcaption id="pick-caption"></figcaption>
+        </figure>
+        <div class="floor">
+          <div class="map-config">
+            <div class="field"><span class="label" id="shape-label">Formato do mapa</span><div class="seg" role="group" aria-labelledby="shape-label"><button type="button" data-shape="tree">Árvore</button><button type="button" data-shape="line">Reta</button></div></div>
+            <div class="field"><label class="label" for="map-steps">Passos</label><input id="map-steps" type="number" min="1" step="1"></div>
+            <div class="field"><label class="label" for="map-events">Eventos “?”</label><input id="map-events" type="number" min="0" step="1"></div>
+            <button type="button" id="map-reroll" class="add reroll">Sortear outra árvore</button>
+          </div>
+          <div class="floor-head"><h4>Mapa do andar</h4><span class="muted" id="floor-count"></span></div>
+          <div class="floor-map" id="floor-map" role="group" aria-label="Mapa do andar"></div>
+          <p class="map-warn" id="map-warn" hidden></p>
+          <div class="node-detail" id="node-detail" aria-live="polite"></div>
+        </div>
+      </div>
+      <details class="zip-files"><summary>Arquivos que vão no ZIP <span class="muted" id="zip-count"></span></summary><ul id="zip-list"></ul></details>
+    </section>
+    <section class="export-bar"><div class="export-summary"><span class="export-icon" data-icon="package"></span><div><strong id="summary-name"></strong><span id="summary-count"></span></div></div><button id="download" class="primary"><span data-icon="download"></span> Exportar pacote <span class="ext">.ZIP</span></button></section>
+    <div id="error" class="error" role="alert" hidden></div>
+  </main>
+  <dialog id="crop" class="crop" aria-labelledby="crop-title"><div class="dialog-head"><h2 id="crop-title">Encaixar a capa</h2><button id="crop-close" class="quiet" aria-label="Cancelar">×</button></div>
+    <p class="option-hint">Arraste a imagem para posicionar e use o zoom para ajustar. A área clara é o que vai para o pacote.</p>
+    <div class="crop-stage" id="crop-stage" tabindex="0" aria-label="Área de recorte. Use as setas para mover a imagem."><img id="crop-img" alt="" draggable="false"><div class="crop-frame" id="crop-frame"></div></div>
+    <label class="label crop-zoom" for="crop-zoom">Zoom</label><input id="crop-zoom" type="range" min="1" max="4" step="0.01" value="1">
+    <div class="crop-actions"><button type="button" class="quiet-link" id="crop-cancel">Cancelar</button><button type="button" class="primary" id="crop-ok">Recortar e usar</button></div>
+  </dialog>
+  <dialog id="info" aria-labelledby="dialog-title"><div class="dialog-head"><h2 id="dialog-title"></h2><button id="close" class="quiet" aria-label="Fechar">×</button></div><div id="dialog-body"></div><button class="primary" id="ok">Entendi</button></dialog>
+  <script src="catalog.js"></script><script src="skins.js"></script><script src="export.js"></script><script src="zip.js"></script><script src="bosses.js"></script><script src="app.js"></script>
+</body></html>
